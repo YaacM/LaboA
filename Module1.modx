@@ -1,0 +1,143 @@
+MODULE Module1
+    !***********************************************************
+    !
+    ! Module:  Module1
+    !
+    ! Description:
+    !   <Insert description here>
+    !
+    ! Author: AR69700
+    !
+    ! Version: 1.0
+    !
+    !***********************************************************
+    
+    
+    !***********************************************************
+    !
+    ! Procedure main
+    !
+    !   This is the entry point of your program
+    !
+    !***********************************************************
+    
+    
+    PROC main()
+    INIT;    
+
+    WHILE TRUE DO
+    TPErase;
+    TPReadFK MessageValue, "Veuillez choisir une procedure", "WobjDemo", "TubeWeldingDemo", "ReferencialDemo","Toutes les procedures",stEmpty ;
+    
+     IF MessageValue = 1 THEN
+         TPErase;
+        TPReadFK MessageValue, "Installer l'outil soudure", "Ack", stEmpty, stEmpty,stEmpty,stEmpty ;
+        WOBJDEMO;
+     ELSEIF MessageValue = 2 THEN
+         TPErase;
+         TPReadFK MessageValue, "Installer l'outil soudure", "Ack", stEmpty, stEmpty,stEmpty,stEmpty ;
+         TubeWelding;
+     ELSEIF MessageValue = 3 THEN
+        TPErase;
+        TPReadFK MessageValue, "Installer l'outil référentiel", "Ack", stEmpty, stEmpty,stEmpty,stEmpty ;
+        ReferencialDemo;
+         
+     ELSEIF MessageValue = 4 THEN
+        TPErase;
+        TPReadFK MessageValue, "Installer l'outil soudure", "Ack", stEmpty, stEmpty,stEmpty,stEmpty ;
+        WOBJDEMO;
+	    TubeWelding;
+        TPErase;
+	    TPReadFK MessageValue, "Installer l'outil référentiel", "Ack", stEmpty, stEmpty,stEmpty,stEmpty ;
+        ReferencialDemo;
+     ENDIF
+	
+     ENDWHILE  
+        
+   
+    ENDPROC
+    
+    PROC INIT()
+        AliasIO IIO_do7_VoyantJaune, LumJaune;
+        AliasIO IIO_do8_VoyantBleu, LumBleu;
+        
+        TriggIo ActiverFusil, 0 \DOp:= LumJaune, 1;
+        TriggIo EteindreFusil, 0 \DOp:= LumJaune, 0;
+        
+        WzSphDef \inside, boule, rPosInit.trans, 150;
+        WZDOSet \Temp, ZoneLumBleu \Inside, boule, LumBleu, 1;
+    ENDPROC
+    
+    PROC WOBJDEMO()
+        INIT;
+        MoveJ rPosInit, v100,fine, tSoudure \WObj:= wobj0;
+        MoveJ rRetrait, v100,fine, tSoudure \WObj:= wobj_plat;
+        TriggL rPos1, v100, ActiverFusil,fine, tSoudure \WObj:= wobj_plat;
+        MoveL rPos2, v100,fine, tSoudure \WObj:= wobj_plat;
+        MoveL rPos3, v100,fine, tSoudure \WObj:= wobj_plat;
+        MoveL rPos4, v100,fine, tSoudure \WObj:= wobj_plat;
+        TriggL rPos1, v100, EteindreFusil,fine, tSoudure \WObj:= wobj_plat;
+        MoveL rRetrait, v100,fine, tSoudure \WObj:= wobj_plat;
+        
+        MoveJ rRetrait, v100,fine, tSoudure \WObj:= wobj_angulaire;
+        TriggL rPos1, v100, ActiverFusil,fine, tSoudure \WObj:= wobj_angulaire;
+        MoveL rPos2, v100,fine, tSoudure \WObj:= wobj_angulaire;
+        MoveL rPos3, v100,fine, tSoudure \WObj:= wobj_angulaire;
+        MoveL rPos4, v100,fine, tSoudure \WObj:= wobj_angulaire;
+        TriggL rPos1, v100, EteindreFusil,fine, tSoudure \WObj:= wobj_angulaire;
+        MoveL rRetrait, v100,fine, tSoudure \WObj:= wobj_angulaire;
+        MoveJ rPosInit, v100,fine, tSoudure \WObj:= wobj0;
+        
+    ENDPROC
+    
+    PROC TubeWelding()
+        INIT;
+        UpdateSpeed;
+        MoveJ rPosInit, rVitesse,fine, tSoudure \WObj:= wobj0;
+        MoveJ reltool(rTube4, -50, 0, 0),v200,z50, tSoudure \WObj:= wobj0;
+        TRIGGL rTube4, rVitesse, ActiverFusil,fine, tSoudure \WObj:= wobj0;
+        MoveC rTube1, rTube2, rVitesse,fine, tSoudure \WObj:= wobj0;
+        TRIGGC rTube3, rTube4, rVitesse, EteindreFusil,fine, tSoudure \WObj:= wobj0;
+        MoveJ reltool(rTube4, -50, 0, 0),rVitesse,z50, tSoudure \WObj:= wobj0;
+        MoveJ rPosInit, rVitesse,fine, tSoudure \WObj:= wobj0;
+    ENDPROC
+    
+    PROC ReferencialDemo()
+        CONST num Rot := 45;
+        INIT;
+
+        MoveJ rPosInit, v100,fine, tReferentiel \WObj:= wobj0;
+        MoveJ rPosDemo1, v300, fine, tReferentiel;
+        MoveJ rPosDemo2, v300, fine, tReferentiel;
+        MoveJ rPosDemo1, v300, fine, tReferentiel;
+        MoveL rPosDemo2, v300, fine, tReferentiel;
+        MoveL rPosDemo1, v300, fine, tReferentiel;
+        MoveL rPosDemo2, v300, fine, tReferentiel;
+	    MoveJ rPosInit, v100,fine, tReferentiel \WObj:= wobj0;	
+        
+        ! Demo rotation autour d'une point ref
+        MoveJ rPosInit, v300, fine, tReferentiel;
+
+	    MoveL rPosDemoRef,v300, fine, tReferentiel\wobj:=wobj0;       
+        MoveL RelTool(rPosDemoRef,0,0,0,\Rx:= Rot), v300, fine, tReferentiel\wobj:=wobj0;
+        MoveL RelTool(rPosDemoRef,0,0,0,\Rx:= -Rot), v5, fine, tReferentiel\wobj:=wobj0;
+	    MoveL rPosDemoRef,v300, fine, tReferentiel\wobj:=wobj0;
+
+    	MoveL rPosDemoRef,v300, fine, tReferentiel\wobj:=wobj0;
+        MoveL RelTool(rPosDemoRef,0,0,0,\Ry:= Rot), v5, fine, tReferentiel\wobj:=wobj0;
+        MoveL RelTool(rPosDemoRef,-0,0,0,\Ry:= -Rot), v5, fine, tReferentiel\wobj:=wobj0;
+	    MoveL rPosDemoRef,v300, fine, tReferentiel\wobj:=wobj0;
+
+	    MoveL rPosDemoRef,v300, fine, tReferentiel\wobj:=wobj0;
+        MoveL RelTool(rPosDemoRef,0,0,0,\Rz:= (Rot-15)), v5, fine, tReferentiel\wobj:=wobj0;
+        MoveL RelTool(rPosDemoRef,0,0,0,\Rz:= -(Rot-15)), v5, fine, tReferentiel\wobj:=wobj0;
+	    MoveL rPosDemoRef,v300, fine, tReferentiel\wobj:=wobj0;
+
+        MoveJ rPosInit, v300, fine, tReferentiel; 
+    ENDPROC
+    
+    PROC UpdateSpeed()
+    ! Définit les vitesses par défaut pour les prochains Move*
+    rVitesse.v_tcp:=Speed;
+    ENDPROC
+ENDMODULE
